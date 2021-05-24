@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	
+
 	"github.com/go-chi/chi"
 )
 
@@ -29,6 +29,9 @@ func RunStubServer(opt Options) {
 	r.Get("/", listStub)
 	r.Post("/find", handleFindStub)
 	r.Get("/clear", handleClearStub)
+  r.Get("/reload", func(w http.ResponseWriter, r *http.Request) {
+    handleReloadStub(w, r, opt.StubPath)
+  })
 
 	if opt.StubPath != "" {
 		readStubFromFile(opt.StubPath)
@@ -161,5 +164,14 @@ func handleFindStub(w http.ResponseWriter, r *http.Request) {
 
 func handleClearStub(w http.ResponseWriter, r *http.Request) {
 	clearStorage()
+	w.Write([]byte("OK"))
+}
+
+
+func handleReloadStub(w http.ResponseWriter, r *http.Request, stubPath string) {
+	if stubPath == "" {
+		readStubFromFile(stubPath)
+	}
+
 	w.Write([]byte("OK"))
 }
